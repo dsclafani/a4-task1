@@ -1,0 +1,63 @@
+---
+title: "a4_task1_danielle_sclafani"
+author: "Danielle Sclafani"
+date: "11/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(janitor)
+library(here)
+library(lubridate)
+library(kableExtra)
+library(dplyr)
+library(ggplot2)
+```
+
+### Bonanza Creek LTER
+> This mini-report will explore counts and sizes of juvenile snowshow hares recorded in 1998-2012
+> add introduction ( a and b- do these last)
+
+
+```{r}
+hare_data <- read_csv(here("bonanza_hares.csv")) #reading in csv, should not include this in final report
+
+juv_data <- hare_data %>% 
+  filter(age =="j") %>%
+  mutate(year = mdy(date)) %>% 
+  mutate(year_new = year(year)) %>% 
+  group_by(year_new) %>%
+  count(year_new) %>% 
+  rename(Year = year_new) %>% 
+  rename("Number of Hares" = n)
+
+```
+
+
+```{r, fig.cap= "Graph 1.0: Total Number of juvenile Hares caught across all testing sites in Bonanza from 1998-2012"}
+
+juv_graph <- hare_data %>% 
+  filter(age =="j") %>%
+  mutate(year = mdy(date)) %>% 
+  mutate(year_new = year(year)) %>% 
+  group_by(year_new) %>%
+  count(age)
+  
+ggplot(data = juv_graph, aes(x= year_new, y = n)) + geom_col() +
+  labs(x = "Year", y = "Number of Juvenile Hares",
+       title = "Number of Juvenile Hares recorded from 1998-2012")+
+  scale_x_continuous(breaks = c(1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012))+
+  theme(plot.title = element_text(hjust=0.5))
+```
+
+
+```{r}
+sum_juv <- summary(juv_data)
+
+sum_juv
+```
+
+> The number of Juvenile Hares caught and recorded 
+
