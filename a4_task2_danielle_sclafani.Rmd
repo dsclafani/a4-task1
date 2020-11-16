@@ -15,6 +15,7 @@ library(kableExtra)
 library(dplyr)
 library(ggplot2)
 library(ggbeeswarm)
+library(effsize)
 ```
 
 ### Bonanza Creek LTER
@@ -46,7 +47,7 @@ juv_graph <- hare_data %>%
   group_by(year_new) %>%
   count(age)
   
-ggplot(data = juv_graph, aes(x= year_new, y = n)) + geom_col() +
+ggplot(data = juv_graph, aes(x= year_new, y = n)) + geom_col(fill="cyan4") +
   labs(x = "Year", y = "Number of Juvenile Hares",
        title = "Number of Juvenile Hares recorded from 1998-2012")+
   scale_x_continuous(breaks = c(1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012))+
@@ -68,52 +69,144 @@ sum_juv
 juv_sex_loc <- hare_data %>%
   filter(age =="j") %>% 
   filter(!is.na(weight)) %>% 
-  group_by(sex, grid) %>% 
-  summarize(mean_weight = mean(weight)) %>%
+  group_by(sex, grid) %>%
+  count(weight) %>%
   mutate(gender = case_when(
     sex == "f"~ "Female",
     sex == "m" ~ "Male",
     sex == "NA" ~ "Undetermined"
-  ))
+  )) %>%
+  mutate(site_name = case_when(
+    grid == "bonbs" ~ "Mature Lowland",
+    grid == "bonmat" ~ "Bonanza Mature",
+    grid == "bonrip" ~ "Bonanza Riparian"))
 
 
 ```
 
-```{r, fig.cap= "Graph 2.0: Mean weight of male, female, and indeterminant sex of juvenile hares in grams, separated by trapping location. }
-ggplot(data= juv_sex_loc, aes(x= gender, y= mean_weight)) + geom_col(aes(fill=sex))+
-  facet_wrap(~grid) +
-  labs(x = "Sex", y = "Mean Weight (g)", 
-       title = "Mean weight (g) of Juvenile Hares by Gender and Capture Site") +
-  theme(plot.title = element_text(hjust = 0.5))
+```{r, fig.cap= "Graph 2.0: Number of male, female, and indeterminant sex of juvenile hares in grams, separated by trapping location."}
+ggplot(data= juv_sex_loc, aes(x= gender)) + geom_bar(aes(fill=sex))+
+  facet_wrap(~site_name) +
+  labs(x = "Sex", y = "Number of Hares", 
+       title = "Number of Juvenile Hares captured by Gender and Capture Site") +
+  theme(plot.title = element_text(hjust = 0.5),
+        legend.position = "none")
 ```
 
-```{r, fig.cap= "Graph 3.0: Weight in grams of juvenile hairs broke out by sex and trap site. Mean weight is shown by black data point on plots for dataset.}
+```{r, fig.cap= "Graph 3.0: Weight in grams of juvenile hairs broke out by sex and trap site. Mean weight and one standard deviation above and below the mean are shown by the black data point and error bars on each plot."}
 beaswarm_juv <- hare_data %>% 
 filter(age =="j") %>% 
   filter(!is.na(weight)) %>%
-  mutate(gender = case_when(
-    sex == "f"~ "Female",
-    sex == "m"~ "Male"
+  mutate(gender = case_when(sex == "f" ~ "Female",
+    sex == "m"~ "Male")) %>% 
+  mutate(site_name = case_when(
+    grid == "bonbs" ~ "Mature Lowland",
+    grid == "bonmat" ~ "Bonanza Mature",
+    grid == "bonrip" ~ "Bonanza Riparian"
   ))
 
 beaswarm_sum_juv <-beaswarm_juv %>% 
   group_by(sex, grid) %>% 
-  summarize(mean_weight = mean(weight)) %>% 
-  mutate(gender = case_when(
-    sex == "f"~ "Female",
-    sex == "m"~ "Male"
+  summarize(mean_weight = mean(weight),
+            sd_weight = sd(weight),
+            sample = n()) %>% 
+  mutate(gender = case_when(sex == "f" ~ "Female",
+    sex == "m"~ "Male")) %>% 
+  mutate(site_name = case_when(
+    grid == "bonbs" ~ "Mature Lowland",
+    grid == "bonmat" ~ "Bonanza Mature",
+    grid == "bonrip" ~ "Bonanza Riparian"
   ))
 
 ggplot() + geom_beeswarm(data = beaswarm_juv, aes(x= gender, y = weight, color = gender),
                          size = 2,
                          alpha = 0.6)+
-  facet_wrap(~grid)+
+  facet_wrap(~site_name)+
   geom_point(data = beaswarm_sum_juv, aes(x = gender, y = mean_weight),
              size = 3)+
   labs(x= "Sex", y ="Weight (g)",
        title = "Weight (g) of Juvenile Hairs by Sex and Trapping Site")+
   theme(plot.title = element_text(hjust=0.5),
-        legend.position = "none")
+        legend.position = "none")+
+   geom_errorbar(data = beaswarm_sum_juv,
+                aes(x=gender, 
+                    ymax = mean_weight + sd_weight,
+                    ymin = mean_weight - sd_weight),
+                width=0.2,
+                alpha=0.7)
 ```
 
+> Graph 2.0 and Graph 3.0 show the distributions of male, female, and indeterminate hare weights across the three different testing sites. The general trend across the three testing sites shows that the mean weight of male juvenile hares is slightly larger than the mean weight of female juvenile hares. However, Graph 3.0 shows that maximum weight of a juvenile female hare in the Mature Lowland is heavier than the maximum weight of male juvenile hare, and the maximum weight of juvenile female hares at Bonanza Mature and Bonanza Riparian are almost equal to the maximum weight of juvenile male hares.At the Bonanza Mature and Bonanza Riparian testing sites, there were several observations resulting in an indeterimant sex, while all hares captured at Mature Lowland had clear sexual classifications. According to Graph 2.0, there are significantly more female hares than male hares in the Mature Lowlands. The other two testing sites have a slightly higher amount of male juvenile hares. Over the course of the study, Bonanza Riparian caught more total juvenile hares than the other two testing sites.
+
+### iii. Juvenile weight comparison (male and female snowshoe hares)
+
+```{r, fig.cap= "Table 1.0: Summary Statistics of male and female juvenile hares caught across all testing sites from 1998-2012. Testing sites include Bonanza Mature, Bonanza Riparian, and Mature Lowland trapping sites. Indeterminant sex hares are excluded from these summary statistics"}
+
+## getting descriptive statistics 
+
+hare_table <- hare_data %>% 
+  filter(age == "j") %>%
+  filter(!is.na(weight)) %>%
+  filter(sex %in% c("f", "m")) %>% 
+  mutate(gender = case_when(sex == "f" ~ "Female",
+    sex == "m"~ "Male")) %>% 
+  mutate(site_name = case_when(grid == "bonbs" ~ "Mature Lowland",
+    grid == "bonmat" ~ "Bonanza Mature",
+    grid == "bonrip" ~ "Bonanza Riparian")) %>% 
+  group_by(gender) %>% 
+  summarize(mean_weight = mean(weight),
+            sd_weight = sd(weight),
+            sample = n()) %>% 
+  rename(Sex = gender,
+         "Mean Weight (g)" = mean_weight,
+         "Standard Deviation (g)" = sd_weight,
+         "Sample Size" = sample)
+
+kable(hare_table) %>% 
+  kable_classic(full_width = F) %>% 
+  add_header_above(c("Summary Statistics of Juvenile Female and Male Hares captured" = 4))
+```
+
+### iv. exploratory graphs of male vs female hares
+
+```{r}
+juv_explor_data <- hare_data %>% 
+  filter(age == "j") %>% 
+  filter(sex %in% c("f", "m")) %>% 
+  filter(!is.na(weight))
+
+ggplot(data = juv_explor_data, aes(x= weight)) + geom_histogram() + facet_wrap(~sex)
+```
+
+
+```{r}
+ggplot(data=juv_explor_data, aes(sample=weight)) + geom_qq() + facet_wrap(~sex)
+```
+
+### v. creating the vectors for the two sample t-test
+
+```{r}
+#creates vectors of male and female juvenile weight
+
+fem_juv_hare <- juv_explor_data %>% 
+  filter(sex == "f") %>% 
+  pull(weight)
+
+male_juv_hare <-juv_explor_data %>% 
+  filter(sex == "m") %>% 
+  pull(weight)
+
+```
+
+### t-test
+
+```{r}
+hare_ttest <- t.test(male_juv_hare, fem_juv_hare, alternative = "greater") # by putting it in this order, we are able to test if males are larger than females- should rewatch this part of week 5 code along, need to understand this better as well as cohen.ds
+hare_ttest
+```
+
+## What does cohen's mean?
+```{r}
+cohen.d(fem_juv_hare, male_juv_hare)
+```
 
