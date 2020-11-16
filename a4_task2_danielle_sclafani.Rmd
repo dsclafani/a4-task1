@@ -14,6 +14,7 @@ library(lubridate)
 library(kableExtra)
 library(dplyr)
 library(ggplot2)
+library(ggbeeswarm)
 ```
 
 ### Bonanza Creek LTER
@@ -59,5 +60,60 @@ sum_juv <- summary(juv_data)
 sum_juv
 ```
 
-> The number of Juvenile Hares caught and recorded 
+> The number of juvenile Hares caught and recorded each year from 1998-2012 varies significantly. In 2008, no juvenile hares were caught and in 2010 only two were caught. While the maximum number of juvenile hares caught occurred in 1999, when 126 juvenile hares were caught. The mean number of juvenil hares captured is 31.5, however, due to this data's overskew the median is a more accurate central descriptive statsitic at 18.5 hares annually recorded. The overall trend of the number of hares recorded is a sharp decline over the years. It is unclear if the same amount of hours and number of traps were put into catching hares each year which would significantly influence the number of hares captured. In order to standardize the data it is important that the collection of data is standardized. The same number of traps should be used each year, in the same locations, and checked at the same frequencies. 
+
+## Data Visualization of juvenile hares by sex and location
+
+```{r}
+juv_sex_loc <- hare_data %>%
+  filter(age =="j") %>% 
+  filter(!is.na(weight)) %>% 
+  group_by(sex, grid) %>% 
+  summarize(mean_weight = mean(weight)) %>%
+  mutate(gender = case_when(
+    sex == "f"~ "Female",
+    sex == "m" ~ "Male",
+    sex == "NA" ~ "Undetermined"
+  ))
+
+
+```
+
+```{r, fig.cap= "Graph 2.0: Mean weight of male, female, and indeterminant sex of juvenile hares in grams, separated by trapping location. }
+ggplot(data= juv_sex_loc, aes(x= gender, y= mean_weight)) + geom_col(aes(fill=sex))+
+  facet_wrap(~grid) +
+  labs(x = "Sex", y = "Mean Weight (g)", 
+       title = "Mean weight (g) of Juvenile Hares by Gender and Capture Site") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r, fig.cap= "Graph 3.0: Weight in grams of juvenile hairs broke out by sex and trap site. Mean weight is shown by black data point on plots for dataset.}
+beaswarm_juv <- hare_data %>% 
+filter(age =="j") %>% 
+  filter(!is.na(weight)) %>%
+  mutate(gender = case_when(
+    sex == "f"~ "Female",
+    sex == "m"~ "Male"
+  ))
+
+beaswarm_sum_juv <-beaswarm_juv %>% 
+  group_by(sex, grid) %>% 
+  summarize(mean_weight = mean(weight)) %>% 
+  mutate(gender = case_when(
+    sex == "f"~ "Female",
+    sex == "m"~ "Male"
+  ))
+
+ggplot() + geom_beeswarm(data = beaswarm_juv, aes(x= gender, y = weight, color = gender),
+                         size = 2,
+                         alpha = 0.6)+
+  facet_wrap(~grid)+
+  geom_point(data = beaswarm_sum_juv, aes(x = gender, y = mean_weight),
+             size = 3)+
+  labs(x= "Sex", y ="Weight (g)",
+       title = "Weight (g) of Juvenile Hairs by Sex and Trapping Site")+
+  theme(plot.title = element_text(hjust=0.5),
+        legend.position = "none")
+```
+
 
