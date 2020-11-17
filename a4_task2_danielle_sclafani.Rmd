@@ -5,7 +5,7 @@ date: "11/15/2020"
 output: html_document
 ---
 
-```{r setup, include=FALSE, warning=FALSE, echo=TRUE}
+```{r setup, include=FALSE, warning=FALSE,echo=TRUE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(janitor)
@@ -51,15 +51,11 @@ juv_graph <- hare_data %>%
   mutate(year_new = year(year)) %>% 
   group_by(year_new) %>%
   count(age)
-  
-ggplot(data = juv_graph, aes(x= year_new, y = n)) + geom_col(fill="cyan4") +
-  labs(x = "Year", y = "Number of Juvenile Hares",
-       title = "Number of Juvenile Hares recorded from 1998-2012")+
-  scale_x_continuous(breaks = c(1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012))+
-  theme(plot.title = element_text(hjust=0.5))
+
 ```
 
-```{r, fig.cap= "Graph 1.0: Total Number of juvenile Hares caught across all testing sites in Bonanza from 1998-2012"}
+```{r, echo=FALSE, fig.cap= "Graph 1.0: Total Number of juvenile Hares caught across all testing sites in Bonanza from 1998-2012"}
+
 ggplot(data = juv_graph, aes(x= year_new, y = n)) + geom_col(fill="cyan4") +
   labs(x = "Year", y = "Number of Juvenile Hares",
        title = "Number of Juvenile Hares recorded from 1998-2012")+
@@ -130,7 +126,7 @@ beaswarm_sum_juv <-beaswarm_juv %>%
 ```
 
 
-```{r, fig.cap= "Graph 2.0: Weight in grams of juvenile hairs broke out by sex and trap site. Mean weight and one standard deviation above and below the mean are shown by the black data point and error bars on each plot."}
+```{r, echo=FALSE, fig.cap= "Graph 2.0: Weight in grams of juvenile hairs broke out by sex and trap site. Mean weight and one standard deviation above and below the mean are shown by the black data point and error bars on each plot."}
 ggplot() + geom_beeswarm(data = beaswarm_juv, aes(x= gender, y = weight, color = gender),
                          size = 2,
                          alpha = 0.6)+
@@ -178,13 +174,13 @@ hare_table <- hare_data %>%
          "Sample Size" = sample)
 ```
 
-```{r, fig.cap= "Table 1.0: Summary Statistics of male and female juvenile hares caught across all testing sites from 1998-2012. Testing sites include Bonanza Mature, Bonanza Riparian, and Mature Lowland trapping sites. Indeterminant sex hares are excluded from these summary statistics"}
+```{r, echo = FALSE, fig.cap= "Table 1.0: Summary Statistics of male and female juvenile hares caught across all testing sites from 1998-2012. Testing sites include Bonanza Mature, Bonanza Riparian, and Mature Lowland trapping sites. Indeterminant sex hares are excluded from these summary statistics"}
 
 kable(hare_table) %>% 
   kable_classic(full_width = F) %>% 
   add_header_above(c("Summary Statistics of Juvenile Female and Male Hares captured" = 4))
 ```
-
+Table 1.0: Summary Statistics of male and female juvenile hares caught across all testing sites from 1998-2012. Testing sites include Bonanza Mature, Bonanza Riparian, and Mature Lowland trapping sites. Indeterminant sex hares are excluded from these summary statistics.
 
 ```{r, include=FALSE}
 
@@ -255,7 +251,7 @@ juv_foot_weight <- hare_data %>%
 
 ```
 
-```{r, fig.cap= "Graph 3.0: Relationship between the length of juvenile hares' hind feet in millimeters and their body weight in grams"}
+```{r, warning=FALSE, echo=FALSE, fig.cap= "Graph 3.0: Relationship between the length of juvenile hares' hind feet in millimeters and their body weight in grams"}
 ggplot(data = juv_foot_weight, aes(x= hindft, y= weight)) + geom_point(color = "cyan4")+
   labs(x= "Hind Foot Length (mm)", y = "Weight (g)",
        title= "Relationship between Juvenile Hare Hind Foot Length (mm) and Weight (g)")+
