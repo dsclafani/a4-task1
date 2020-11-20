@@ -18,7 +18,7 @@ library(ggbeeswarm)
 library(effsize)
 ```
 
-## Bonanza Creek LTER: Analysis of Juvenile Snowshoe Hare Weight in grams
+## Bonanza Creek LTER: Analysis of Juvenile Snowshoe Hares
 
 ### Introduction
 > Snowshoe hares are an important prey species in the Bonanza Creek ecosystem in Alaska. Physical characteristics of snowshoe hares is explored in this report. The data used in this report is from the EDI Data Portal and is titled "Snowshoe hare physical data in Bonanza Creek Experimental Forest: 1999-Preent". The dataset includes recordings of snowshoe hares that were trapped from 1998-2012 at three different locations within the Bonanza Creek region, the Bonanza Riparian which is a flood zone along the Tanana River, the Bonanza Mature a spruce tree forest, and Mature Lowlands (Kielland, K., Snowshoe hare physical data in Bonanza Creek Experimental Forest: 1999-Present ver 22). The intentions of this data collection was to monitor the population decline of snowshoe hares in this region. This analysis includes a preview of this population decline, as well as analysis between sex and the weight of juvenile snowshoe hares, as well as the relationship between the length of juvenile hare hind feet and their body weight.
@@ -70,9 +70,9 @@ sum_juv <- summary(juv_data)
 sum_juv
 ```
 
-> The number of juvenile Hares caught and recorded each year from 1998-2012 varies significantly. In 2008, no juvenile hares were caught and in 2010 only two were caught. While the maximum number of juvenile hares caught occurred in 1999, at 126 juvenile hares. The mean number of juvenile hares captured is 31.5, however, due to this data's overall skew the median is a more accurate central descriptive statsitic at 18.5 hares annually recorded. As seen in Graph 1.0, the overall trend of the number of hares recorded sharply declines over the years. It is unclear if the same amount of hours and number of traps were put into catching hares each year. This would significantly influence the number of hares captured. In order to ensure the data does not have any bias, it is important that the collection of data is standardized. The same number of traps should be used each year, in the same locations, and checked at the same frequencies. 
+> The number of juvenile hares caught and recorded each year from 1998-2012 varies significantly. In 2008, no juvenile hares were caught and in 2010 only two were caught. While the maximum number of juvenile hares caught occurred in 1999, at 126 juvenile hares. The mean number of juvenile hares captured is 31.5, however, due to this data's overall skew the median is a more accurate central descriptive statsitic at 18.5 hares annually recorded. As seen in Graph 1.0, the overall trend of the number of hares recorded sharply declines over the years. It is unclear if the same amount of hours and number of traps were put into catching hares each year. Also, the criteria for identifiying a hare's age is not explicit. This would significantly influence the number of hares captured and identified as "juvenile". In order to ensure the data does not have any bias, it is important that the collection of data is standardized. The same number of traps should be used each year, in the same locations, and checked at the same frequencies. Also, the criteria for a hare being categorized as juvenile needs to be explicitly stated and continuously followed throughout the years of the study.
 
-### Analysis of weight of male, female, and indeterminant sex Juvenile Hares separated by trapping region
+### Analysis of weight of male, female, and indeterminant sex juvenile hares separated by trapping site
 
 ```{r, include=FALSE}
 #data visualization of juvenile hares by sex and location
